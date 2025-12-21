@@ -18,9 +18,16 @@ const schema = mongoose.Schema({
         type: String,
         default: "user",
     },
-    subscription: [{
-        type: mongoose.Schema.Types.ObjectId,
-         ref: "course",
-    }]
+    subscription: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "course",
+        },
+    ],
 
+},{
+    timestamps: true,
 });
+
+
+export const User = mongoose.model("User", schema); 

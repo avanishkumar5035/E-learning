@@ -1,8 +1,14 @@
-import express from 'express';
-import { register } from '../controllers/user.js';
+import express from "express";
+import { register } from "../controllers/user.js";
 
 const router = express.Router();
 
-router.get('/user/register', register);
+// ✅ Browser ke liye GET route
+router.get("/user/register", (req, res) => {
+  res.send("Register page working in browser ✅");
+});
 
-export default router
+// ✅ Actual API (POST)
+router.post("/user/register", register);
+
+export default router;
