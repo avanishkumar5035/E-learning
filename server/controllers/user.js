@@ -1,50 +1,36 @@
-import { User } from "../models/user.js";
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
+export const register = async (req, res) => {
+  try {
+    const { email, name, password } = req.body;
 
+    let user = await User.findOne({ email: email });
 
-export  const register = async(req,res) =>{
-    try {
-        const { email, name, password } = req.body
+    if (user) {
+      return res.status(400).json({
+        message: "User Already exists",
+      });
+    }
 
-        let user = await User.findOne({email});
+    const hashPassword = await bcrypt.hash(password, 10);
 
+    user = { name, email, password: hashPassword };
 
-        if (user) return res.status(400).json({
-            message: "User Already exists",
-        });
+    const otp = Math.floor(100000 + Math.random() * 900000);
 
-        const hashPassword = await bcrypt.hash(password, 10 )
-
-        user = {
-            name,
-            email,
-            password: hashPassword,
-        }
-
-
-        const otp = Math.floor(Math.random() * 1000000);
-
-        const activationToken = jwt.sign({
-            user,
-            otp,
-        }, 
-        process.env.Activation_Secret,
-        {
-            expiresIn: "5m",
-        }
+    const activationToken = jwt.sign(
+      { user, otp },
+      process.env.Activation_Secret,
+      { expiresIn: "5m" }
     );
 
-    const data = {
-        name,
-        otp,
-    };
+    await sendMail(email, "E-learning OTP", { name, otp });
 
-    
-        
-    } catch (error) {
-        res.status(300).json({
-            message: error.message,
-        });
-    }
+    res.status(200).json({
+      message: "OTP sent to your mail",
+      activationToken,
+    });
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 };

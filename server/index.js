@@ -13,6 +13,12 @@ app.get("/", (req, res) => {
 
 });
 
+//using middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+
+
 // importing routes
 
 import userRoutes from './routes/user.js'
